@@ -18,8 +18,6 @@ import org.bitcoinj.net.discovery.DnsDiscovery;
 import org.bitcoinj.store.SPVBlockStore;
 import org.bitcoinj.wallet.DeterministicSeed;
 import org.bitcoinj.wallet.Wallet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -28,7 +26,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class RestoreWalletByMneonicCode extends WalletParams implements ApplicationListener<ApplicationReadyEvent> {
 	
-	 private static final Logger log = LoggerFactory.getLogger(RestoreWalletByMneonicCode.class);
 	 
 	 @Override
 		public void onApplicationEvent(ApplicationReadyEvent event) {
