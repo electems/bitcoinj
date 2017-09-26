@@ -1,12 +1,10 @@
 package com.example;
 
+import static com.example.FakeTxBuilder.createFakeTx;
 import static org.bitcoinj.core.Coin.COIN;
 import static org.bitcoinj.core.Coin.valueOf;
-import static org.bitcoinj.testing.FakeTxBuilder.createFakeTx;
 
 import java.io.File;
-import java.security.SecureRandom;
-import java.util.List;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.BlockChain;
@@ -16,40 +14,43 @@ import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.core.listeners.DownloadProgressTracker;
-import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.net.discovery.DnsDiscovery;
-import org.bitcoinj.store.MemoryBlockStore;
 import org.bitcoinj.store.SPVBlockStore;
-import org.bitcoinj.testing.KeyChainTransactionSigner;
-import org.bitcoinj.wallet.DeterministicKeyChain;
 import org.bitcoinj.wallet.DeterministicSeed;
-import org.bitcoinj.wallet.MarriedKeyChain;
 import org.bitcoinj.wallet.Wallet;
-import org.junit.After;
-import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
 
 //Following Class has logic to Restore the Wallet By using MneonicCode which is created while backup of Wallet
-public class RestoreWalletByMneonicCode extends WalletParams {
+@Component
+public class RestoreWalletByMneonicCode extends WalletParams implements ApplicationListener<ApplicationReadyEvent> {
 	
 	 private static final Logger log = LoggerFactory.getLogger(RestoreWalletByMneonicCode.class);
+	 
+	 @Override
+		public void onApplicationEvent(ApplicationReadyEvent event) {
+		 	try {
+		 		setUp();
+		 		tearDown();
+				transactions();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	    
 	    private static String mnemonicCode = "";	    
 	    private static Long creationDate = null;
 
 	    private final Address OTHER_ADDRESS = new ECKey().toAddress(PARAMS);
 	    
-	    @Before
-	    @Override
+	    
 	    public void setUp() throws Exception {
 	        super.setUp();
 	    }
-
-	    @After
-	    @Override
+	    
 	    public void tearDown() throws Exception {
 	        super.tearDown();
 	    }
@@ -67,25 +68,8 @@ public class RestoreWalletByMneonicCode extends WalletParams {
 	        creationDate = seed.getCreationTimeSeconds();
 	        
 	        System.out.println("mnemonicCode: " + Utils.join(seed.getMnemonicCode()));
-	        System.out.println("creation time: " + seed.getCreationTimeSeconds());
-	        
-	        blockStore = new MemoryBlockStore(PARAMS);
-	        chain = new BlockChain(PARAMS, wallet, blockStore);
-
-	        List<DeterministicKey> followingKeys = Lists.newArrayList();
-	        for (int i = 0; i < numKeys - 1; i++) {
-	            final DeterministicKeyChain keyChain = new DeterministicKeyChain(new SecureRandom());
-	            DeterministicKey partnerKey = DeterministicKey.deserializeB58(null, keyChain.getWatchingKey().serializePubB58(PARAMS), PARAMS);
-	            followingKeys.add(partnerKey);
-	            if (addSigners && i < threshold - 1)
-	                wallet.addTransactionSigner(new KeyChainTransactionSigner(keyChain));
-	        }
-
-	        MarriedKeyChain chain = MarriedKeyChain.builder()
-	                .random(new SecureRandom())
-	                .followingKeys(followingKeys)
-	                .threshold(threshold).build();
-	        wallet.addAndActivateHDChain(chain);        
+	        System.out.println("creation time: " + seed.getCreationTimeSeconds());      
+	           
 	        
 	    }
 	    
@@ -100,7 +84,9 @@ public class RestoreWalletByMneonicCode extends WalletParams {
 	        
 	        // Now add another output (ie, change) that goes to some other address.
 	        TransactionOutput output = new TransactionOutput(PARAMS, tx, valueOf(0, 5), OTHER_ADDRESS);
-	        tx.addOutput(output);        	        
+	        tx.addOutput(output);     
+	        
+	        resotreWalletFromMnemonic();
 	        
 	    }
 	    
@@ -131,7 +117,7 @@ public class RestoreWalletByMneonicCode extends WalletParams {
 	        PeerGroup peers = new PeerGroup(PARAMS, chain);
 	        peers.addPeerDiscovery(new DnsDiscovery(PARAMS));
 
-	        // Now we need to hook the wallet up to the blockchain and the peers. This registers event listeners that notify our wallet about new transactions.
+	        // This registers event listeners that notify our wallet about new transactions.
 	        chain.addWallet(wallet);
 	        peers.addWallet(wallet);
 
@@ -153,7 +139,6 @@ public class RestoreWalletByMneonicCode extends WalletParams {
 
 	        // shutting down again
 	        peers.stop();
-	    }
-	    
+	    }	
 	
 }

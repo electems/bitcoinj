@@ -1,6 +1,6 @@
 package com.example;
 
-import static org.bitcoinj.testing.FakeTxBuilder.createFakeBlock;
+import static com.example.FakeTxBuilder.createFakeBlock;
 
 import javax.annotation.Nullable;
 
@@ -16,12 +16,12 @@ import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.VerificationException;
 import org.bitcoinj.store.BlockStore;
 import org.bitcoinj.store.MemoryBlockStore;
-import org.bitcoinj.testing.FakeTxBuilder;
+import com.example.FakeTxBuilder;
 import org.bitcoinj.utils.BriefLogFormatter;
 import org.bitcoinj.wallet.Wallet;
 
 public class WalletParams {
-    protected static final NetworkParameters PARAMS = TestNet3Params.get();
+    protected static final NetworkParameters PARAMS = Net3Params.get();
     protected ECKey myKey;
     protected Address myAddress;
     protected Wallet wallet;

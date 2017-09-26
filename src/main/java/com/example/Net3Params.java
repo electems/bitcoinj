@@ -15,12 +15,12 @@ import org.bitcoinj.params.TestNet2Params;
 import org.bitcoinj.store.BlockStore;
 import org.bitcoinj.store.BlockStoreException;
 
-public class TestNet3Params extends AbstractBitcoinNetParams {
+public class Net3Params extends AbstractBitcoinNetParams {
     public static final int UNITNET_MAJORITY_WINDOW = 8;
     public static final int TESTNET_MAJORITY_REJECT_BLOCK_OUTDATED = 6;
     public static final int TESTNET_MAJORITY_ENFORCE_BLOCK_UPGRADE = 4;
 
-    public TestNet3Params() {
+    public Net3Params() {
         super();
         id = ID_TESTNET;
         // Genesis hash is 000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943
@@ -58,10 +58,10 @@ public class TestNet3Params extends AbstractBitcoinNetParams {
         majorityWindow = TestNet2Params.TESTNET_MAJORITY_WINDOW;
     }
 
-    private static TestNet3Params instance;
-    public static synchronized TestNet3Params get() {
+    private static Net3Params instance;
+    public static synchronized Net3Params get() {
         if (instance == null) {
-            instance = new TestNet3Params();
+            instance = new Net3Params();
         }
         return instance;
     }
